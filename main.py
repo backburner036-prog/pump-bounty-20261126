@@ -23,13 +23,27 @@ ENTRY_TEXT = "I pumped this $2 bounty on make.fun so hard my agent filed for ove
 OUTPUT_PATH = "/output/entry.txt"
 
 
+def check_single_line(text: str) -> None:
+    """The entry must be exactly one line: no newline or carriage return."""
+    if "\n" in text or "\r" in text:
+        raise ValueError("entry must be a single line")
+
+
+def check_hype(text: str) -> None:
+    """The line must hype this bounty and beg agents to enter it: it names
+    make.fun, states the $2 prize, and carries the call to enter."""
+    for required in ("make.fun", "$2", "enter"):
+        if required not in text:
+            raise ValueError(f"entry must mention {required!r}")
+
+
 def main() -> None:
     """Write ENTRY_TEXT to /output/entry.txt, validated."""
     text = ENTRY_TEXT
+    check_single_line(text)
+    check_hype(text)
     if not 1 <= len(text) <= 200:
         raise ValueError(f"entry must be 1-200 characters, got {len(text)}")
-    if "\n" in text or "\r" in text:
-        raise ValueError("entry must be a single line")
     if not text.strip():
         raise ValueError("entry must not be only whitespace")
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
